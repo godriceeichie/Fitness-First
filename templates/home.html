@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block title %}Fitness First GYM - Home{% endblock %}
+
+{% block content %}
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="container text-center">
+            <h1 class="display-4">Welcome to Fitness First GYM</h1>
+            <p class="lead">Your journey to a healthier lifestyle starts here!</p>
+            <a href="{% url 'packages' %}" class="btn btn-primary btn-lg">Explore Packages</a>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="container my-5">
+        <div class="row text-center">
+            <div class="col-md-4 mb-4">
+                <div class="p-3">
+                    <i class="fas fa-dumbbell fa-3x text-primary mb-3"></i>
+                    <h3>Modern Equipment</h3>
+                    <p>State-of-the-art fitness equipment to help you achieve your goals.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="p-3">
+                    <i class="fas fa-users fa-3x text-primary mb-3"></i>
+                    <h3>Expert Trainers</h3>
+                    <p>Certified professional trainers to guide you through your fitness journey.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="p-3">
+                    <i class="fas fa-clock fa-3x text-primary mb-3"></i>
+                    <h3>Flexible Hours</h3>
+                    <p>We're open early and close late to fit your busy schedule.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Featured Packages -->
+    <div class="container my-5">
+        <h2 class="text-center mb-4">Featured Packages</h2>
+        <div class="row">
+            {% for package in packages %}
+                <div class="col-md-3 mb-4">
+                    <div class="card h-100">
+                        {% if package.image %}
+                            <img src="{{ package.image.url }}" class="card-img-top" alt="{{ package.name }}">
+                        {% else %}
+                            <img src="/static/images/package-placeholder.jpg" class="card-img-top" alt="{{ package.name }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ package.name }}</h5>
+                            <p class="card-text">{{ package.description|truncatechars:100 }}</p>
+                            <p class="fw-bold">${{ package.price }} for {{ package.duration }} days</p>
+                            <a href="{% url 'package_detail' package.id %}" class="btn btn-primary">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center">
+                    <p>No packages available at the moment.</p>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-3">
+            <a href="{% url 'packages' %}" class="btn btn-outline-primary">View All Packages</a>
+        </div>
+    </div>
+
+    <!-- Featured Trainers -->
+    <div class="container my-5">
+        <h2 class="text-center mb-4">Our Expert Trainers</h2>
+        <div class="row">
+            {% for trainer in trainers %}
+                <div class="col-md-3 mb-4">
+                    <div class="card h-100">
+                        {% if trainer.image %}
+                            <img src="{{ trainer.image.url }}" class="card-img-top" alt="{{ trainer.name }}">
+                        {% else %}
+                            <img src="/static/images/trainer-placeholder.jpg" class="card-img-top" alt="{{ trainer.name }}">
+                        {% endif %}
+                        <div class="card-body text-center">
+                            <h5 class="card-title">{{ trainer.name }}</h5>
+                            <p class="card-text">{{ trainer.specialization }}</p>
+                            <p class="text-muted">{{ trainer.experience }} years experience</p>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center">
+                    <p>No trainers available at the moment.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Testimonials -->
+    <div class="bg-light py-5">
+        <div class="container">
+            <h2 class="text-center mb-4">What Our Members Say</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="mb-3 text-warning">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <p class="card-text">"Joining Fitness First was the best decision I've made for my health. The trainers are knowledgeable and the equipment is top-notch."</p>
+                            <p class="fw-bold mb-0">- John Smith</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="mb-3 text-warning">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <p class="card-text">"The staff is friendly and the atmosphere is motivating. I've seen amazing results since I started training here."</p>
+                            <p class="fw-bold mb-0">- Sarah Johnson</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="mb-3 text-warning">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <p class="card-text">"Great variety of classes and equipment. The trainers are supportive and the facility is always clean."</p>
+                            <p class="fw-bold mb-0">- Michael Brown</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="container my-5 text-center">
+        <h2>Ready to Start Your Fitness Journey?</h2>
+        <p class="lead">Join Fitness First GYM today and transform your life!</p>
+        <div class="mt-4">
+            <a href="{% url 'register' %}" class="btn btn-primary btn-lg mx-2">Sign Up Now</a>
+            <a href="{% url 'contact' %}" class="btn btn-outline-secondary btn-lg mx-2">Contact Us</a>
+        </div>
+    </div>
+{% endblock %}

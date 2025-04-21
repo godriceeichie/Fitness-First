@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Fitness First GYM - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2>Admin Dashboard</h2>
+    <div class="row mt-4">
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-dark">
+                <div class="card-body">
+                    <h5 class="card-title">Total Bookings</h5>
+                    <p class="card-text">{{ total_bookings }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-dark">
+                <div class="card-body">
+                    <h5 class="card-title">Total Members</h5>
+                    <p class="card-text">{{ total_users }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-dark">
+                <div class="card-body">
+                    <h5 class="card-title">Total Packages</h5>
+                    <p class="card-text">{{ total_packages }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-dark">
+                <div class="card-body">
+                    <h5 class="card-title">Pending Payments</h5>
+                    <p class="card-text">{{ pending_bookings }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Manage Categories</h5>
+                    <p>Add, edit, or delete package categories.</p>
+                    <a href="{% url 'admin_categories' %}" class="btn btn-primary">Go to Categories</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Manage Packages</h5>
+                    <p>Add, edit, or delete membership packages.</p>
+                    <a href="{% url 'admin_packages' %}" class="btn btn-primary">Go to Packages</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Manage Bookings</h5>
+                    <p>View and update booking and payment details.</p>
+                    <a href="{% url 'admin_bookings' %}" class="btn btn-primary">Go to Bookings</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Manage Package Types</h5>
+                    <p>Add, edit, or delete package types.</p>
+                    <a href="{% url 'admin_package_types' %}" class="btn btn-primary">Go to Package Types</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Generate Reports</h5>
+                    <p>View booking and user reports by date range.</p>
+                    <a href="{% url 'admin_reports' %}" class="btn btn-primary">Go to Reports</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Admin Profile</h5>
+                    <p>Update your admin profile or change password.</p>
+                    <a href="{% url 'profile' %}" class="btn btn-primary">Go to Profile</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

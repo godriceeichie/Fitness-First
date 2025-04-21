@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Fitness First GYM - Add Trainer{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h2 class="text-center mb-4">Add New Trainer</h2>
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="specialization" class="form-label">Specialization</label>
+                            <input type="text" class="form-control" id="specialization" name="specialization" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="experience" class="form-label">Experience (years)</label>
+                            <input type="number" class="form-control" id="experience" name="experience" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="bio" class="form-label">Bio</label>
+                            <textarea class="form-control" id="bio" name="bio" rows="5" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Image</label>
+                            <input type="file" class="form-control" id="image" name="image">
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="is_active" name="is_active" checked>
+                            <label for="is_active" class="form-check-label">Active</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Add Trainer</button>
+                    </form>
+                    <p class="text-center mt-3">
+                        <a href="{% url 'admin_trainers' %}" class="text-muted">Back to Trainers</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

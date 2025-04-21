@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Fitness First GYM - Manage Packages{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2>Manage Packages</h2>
+    <div class="mb-4">
+        <a href="{% url 'admin_add_package' %}" class="btn btn-primary">Add New Package</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Package Type</th>
+                    <th>Price</th>
+                    <th>Duration</th>
+                    <th>Active</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for package in packages %}
+                    <tr>
+                        <td>{{ package.name }}</td>
+                        <td>{{ package.category.name }}</td>
+                        <td>{{ package.package_type.name }}</td>
+                        <td>${{ package.price }}</td>
+                        <td>{{ package.duration }} days</td>
+                        <td>{{ package.is_active|yesno:"Yes,No" }}</td>
+                        <td>
+                            <a href="{% url 'admin_edit_package' package.id %}" class="btn btn-sm btn-primary">Edit</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center">No packages found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="text-center mt-4">
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-primary">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

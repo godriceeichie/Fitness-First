@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Fitness First GYM - My Dashboard{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2>Welcome, {{ user.username }}!</h2>
+    <div class="row mt-4">
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Profile</h5>
+                    <p>View and update your personal information.</p>
+                    <a href="{% url 'profile' %}" class="btn btn-primary">Go to Profile</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">My Bookings</h5>
+                    <p>Check your booking history and payment details.</p>
+                    <a href="{% url 'booking_history' %}" class="btn btn-primary">View Bookings</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Change Password</h5>
+                    <p>Update your account password for security.</p>
+                    <a href="{% url 'change_password' %}" class="btn btn-primary">Change Password</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mt-4">
+        <h3>Your Bookings</h3>
+        <p><strong>Total Bookings:</strong> {{ total_bookings }}</p>
+        <div class="row">
+            <div class="col-md-6">
+                <h4>Active Bookings</h4>
+                {% if active_bookings %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Package</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in active_bookings %}
+                                    <tr>
+                                        <td>{{ booking.package.name }}</td>
+                                        <td>{{ booking.start_date|date:"Y-m-d" }}</td>
+                                        <td>{{ booking.end_date|date:"Y-m-d" }}</td>
+                                        <td>{{ booking.status|title }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p>No active bookings.</p>
+                {% endif %}
+            </div>
+            <div class="col-md-6">
+                <h4>Expired Bookings</h4>
+                {% if expired_bookings %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Package</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in expired_bookings %}
+                                    <tr>
+                                        <td>{{ booking.package.name }}</td>
+                                        <td>{{ booking.start_date|date:"Y-m-d" }}</td>
+                                        <td>{{ booking.end_date|date:"Y-m-d" }}</td>
+                                        <td>{{ booking.status|title }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p>No expired bookings.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="mt-4">
+        <h3>Explore Packages</h3>
+        <p>Find the perfect membership package for your fitness goals.</p>
+        <a href="{% url 'packages' %}" class="btn btn-outline-primary">View Packages</a>
+    </div>
+</div>
+{% endblock %}

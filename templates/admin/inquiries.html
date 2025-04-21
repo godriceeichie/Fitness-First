@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Fitness First GYM - Manage Inquiries{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2>Manage Inquiries</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Message</th>
+                    <th>Resolved</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for inquiry in inquiries %}
+                    <tr>
+                        <td>{{ inquiry.name }}</td>
+                        <td>{{ inquiry.email }}</td>
+                        <td>{{ inquiry.phone }}</td>
+                        <td>{{ inquiry.message|truncatechars:100 }}</td>
+                        <td>{{ inquiry.is_resolved|yesno:"Yes,No" }}</td>
+                        <td>{{ inquiry.created_at|date:"Y-m-d H:i" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center">No inquiries found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="text-center mt-4">
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-primary">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Fitness First GYM - Add Package{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h2 class="text-center mb-4">Add New Package</h2>
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Category</label>
+                            <select name="category" id="category" class="form-select" required>
+                                {% for category in categories %}
+                                    <option value="{{ category.id }}">{{ category.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="package_type" class="form-label">Package Type</label>
+                            <select name="package_type" id="package_type" class="form-select" required>
+                                {% for package_type in package_types %}
+                                    <option value="{{ package_type.id }}">{{ package_type.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="5" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="duration" class="form-label">Duration (days)</label>
+                            <input type="number" class="form-control" id="duration" name="duration" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Price ($)</label>
+                            <input type="number" step="0.01" class="form-control" id="price" name="price" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Image</label>
+                            <input type="file" class="form-control" id="image" name="image">
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="is_active" name="is_active" checked>
+                            <label for="is_active" class="form-check-label">Active</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Add Package</button>
+                    </form>
+                    <p class="text-center mt-3">
+                        <a href="{% url 'admin_packages' %}" class="text-muted">Back to Packages</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

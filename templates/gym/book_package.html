@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Fitness First GYM - Book {{ package.name }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow border-0 rounded-lg">
+                <div class="card-header bg-primary text-white py-3">
+                    <h2 class="text-center mb-0 fw-bold">Book Your Fitness Journey</h2>
+                </div>
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <h3 class="text-primary">{{ package.name }}</h3>
+                        <p class="text-muted">Start your transformation today</p>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-8 mx-auto">
+                            <div class="package-details p-3 bg-light rounded">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="fw-bold">Package:</span>
+                                    <span class="fs-5 text-primary">{{ package.name }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="fw-bold">Duration:</span>
+                                    <span>{{ package.duration }} days</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">Price:</span>
+                                    <span class="fs-4 fw-bold text-success">${{ package.price }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <p>{{ field.label }}: {{ error }}</p>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <form method="post" action="{% url 'book_package' package.id %}">
+                        {% csrf_token %}
+                        {{ form.package.as_hidden }}
+                        <div class="mb-4">
+                            <label for="{{ form.start_date.id_for_label }}" class="form-label fw-bold">When would you like to start?</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                                {{ form.start_date }}
+                            </div>
+                            {% if form.start_date.errors %}
+                                <div class="text-danger small mt-1">{{ form.start_date.errors }}</div>
+                            {% endif %}
+                            <div class="form-text text-muted">Choose a date to begin your fitness program</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg py-3 fw-bold">
+                                <i class="fas fa-check-circle me-2"></i>Confirm Booking
+                            </button>
+                            <a href="{% url 'packages' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Packages
+                            </a>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer bg-light text-center py-3">
+                    <p class="mb-0 small">Need help? Contact our support team at <strong>support@fitnessfirst.com</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

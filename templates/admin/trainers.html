@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Fitness First GYM - Manage Trainers{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2>Manage Trainers</h2>
+    <div class="mb-4">
+        <a href="{% url 'admin_add_trainer' %}" class="btn btn-primary">Add New Trainer</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Specialization</th>
+                    <th>Experience</th>
+                    <th>Active</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for trainer in trainers %}
+                    <tr>
+                        <td>{{ trainer.name }}</td>
+                        <td>{{ trainer.specialization }}</td>
+                        <td>{{ trainer.experience }} years</td>
+                        <td>{{ trainer.is_active|yesno:"Yes,No" }}</td>
+                        <td>
+                            <!-- Placeholder for edit action if implemented -->
+                            <a href="#" class="btn btn-sm btn-primary disabled">Edit</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No trainers found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="text-center mt-4">
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-primary">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

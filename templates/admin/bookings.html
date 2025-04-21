@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Fitness First GYM - Manage Bookings{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2>Manage Bookings</h2>
+    <div class="mb-4">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label for="status" class="form-label">Filter by Status</label>
+                <select name="status" id="status" class="form-select">
+                    <option value="">All</option>
+                    <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="confirmed" {% if status_filter == 'confirmed' %}selected{% endif %}>Confirmed</option>
+                    <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="payment" class="form-label">Filter by Payment Status</label>
+                <select name="payment" id="payment" class="form-select">
+                    <option value="">All</option>
+                    <option value="pending" {% if payment_filter == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="partial" {% if payment_filter == 'partial' %}selected{% endif %}>Partial</option>
+                    <option value="full" {% if payment_filter == 'full' %}selected{% endif %}>Full</option>
+                </select>
+            </div>
+            <div class="col-md-4 align-self-end">
+                <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+            </div>
+        </form>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Package</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Status</th>
+                    <th>Payment Status</th>
+                    <th>Amount Paid</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                    <tr>
+                        <td>{{ booking.id }}</td>
+                        <td>{{ booking.user.username }}</td>
+                        <td>{{ booking.package.name }}</td>
+                        <td>{{ booking.start_date|date:"Y-m-d" }}</td>
+                        <td>{{ booking.end_date|date:"Y-m-d" }}</td>
+                        <td>{{ booking.status|title }}</td>
+                        <td>{{ booking.payment_status|title }}</td>
+                        <td>${{ booking.amount_paid }}</td>
+                        <td>
+                            <a href="{% url 'admin_update_booking' booking.id %}" class="btn btn-sm btn-primary">Update</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center">No bookings found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="text-center mt-4">
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-primary">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

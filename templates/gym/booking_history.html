@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Fitness First GYM - Booking History{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2>My Booking History</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Package</th>
+                    <th>Booking Date</th>
+                    <th>Price</th>
+                    <th>Payment Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                    <tr>
+                        <td>{{ booking.package.name }}</td>
+                        <td>{{ booking.booking_date|date:"Y-m-d" }}</td>
+                        <td>${{ booking.package.price }}</td>
+                        <td>{{ booking.payment_status }}</td>
+                        <td>
+                            <a href="{% url 'book_package' booking.id %}" class="btn btn-sm btn-primary">View Details</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No bookings found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="text-center mt-4">
+        <a href="{% url 'packages' %}" class="btn btn-primary">Explore More Packages</a>
+    </div>
+</div>
+{% endblock %}

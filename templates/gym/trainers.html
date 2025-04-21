@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Fitness First GYM - Trainers{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="text-center mb-4">Our Expert Trainers</h2>
+    <div class="row">
+        {% for trainer in trainers %}
+            <div class="col-md-3 mb-4">
+                <div class="card h-100">
+                    {% if trainer.image %}
+                        <img src="{{ trainer.image.url }}" class="card-img-top" alt="{{ trainer.name }}">
+                    {% else %}
+                        <img src="/static/images/trainer-placeholder.jpg" class="card-img-top" alt="{{ trainer.name }}">
+                    {% endif %}
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ trainer.name }}</h5>
+                        <p class="card-text">{{ trainer.specialization }}</p>
+                        <p class="text-muted">{{ trainer.experience }} years experience</p>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center">
+                <p>No trainers available at the moment.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

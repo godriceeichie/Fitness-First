@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Fitness First GYM - Manage Package Types{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2>Manage Package Types</h2>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Add New Package Type</h5>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="4"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Add Package Type</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Created At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for package_type in package_types %}
+                            <tr>
+                                <td>{{ package_type.name }}</td>
+                                <td>{{ package_type.description|truncatechars:100 }}</td>
+                                <td>{{ package_type.created_at|date:"Y-m-d" }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center">No package types found.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="text-center mt-4">
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-primary">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

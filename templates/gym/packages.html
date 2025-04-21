@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Fitness First GYM - Packages{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="text-center mb-4">Our Membership Packages</h2>
+    <div class="row">
+        {% for package in packages %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    {% if package.image %}
+                        <img src="{{ package.image.url }}" class="card-img-top" alt="{{ package.name }}">
+                    {% else %}
+                        <img src="/static/images/package-placeholder.jpg" class="card-img-top" alt="{{ package.name }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ package.name }}</h5>
+                        <p class="card-text">{{ package.description|truncatechars:150 }}</p>
+                        <p class="fw-bold">${{ package.price }} for {{ package.duration }} days</p>
+                        <a href="{% url 'package_detail' package.id %}" class="btn btn-primary">View Details</a>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'book_package' package.id %}" class="btn btn-outline-primary mt-2">Book Now</a>
+                        {% else %}
+                            <a href="{% url 'login' %}" class="btn btn-outline-primary mt-2">Login to Book</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center">
+                <p>No packages available at the moment.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
