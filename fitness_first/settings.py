@@ -1,5 +1,8 @@
 from pathlib import Path
-import os
+from dotenv import load_dotenv
+import os, dj_database_url
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -12,7 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-as2^6^$-#g=k&u*chl#22c-ba!_fca7@!eb)67v-g9gr3_txl!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG')
 
 ALLOWED_HOSTS = ['fitness-first-ybbz.onrender.com', 'localhost', 'fitness-first-production.up.railway.app']
 
@@ -69,10 +72,7 @@ WSGI_APPLICATION = 'fitness_first.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(default='sqlite:///db.sqlite3')
 }
 
 
