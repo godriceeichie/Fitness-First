@@ -14,7 +14,7 @@ SECRET_KEY = 'django-insecure-as2^6^$-#g=k&u*chl#22c-ba!_fca7@!eb)67v-g9gr3_txl!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['fitness-first-ybbz.onrender.com', 'localhost']
+ALLOWED_HOSTS = ['fitness-first-ybbz.onrender.com', 'localhost', 'fitness-first-production.up.railway.app']
 
 
 # Application definition
