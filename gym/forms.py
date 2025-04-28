@@ -13,9 +13,9 @@ class UserRegisterForm(UserCreationForm):
     class Meta:
         model = User
         fields = [
-            "username",
             "first_name",
             "last_name",
+            "username",
             "email",
             "password1",
             "password2",
@@ -25,21 +25,33 @@ class UserRegisterForm(UserCreationForm):
 class UserProfileForm(forms.ModelForm):
     phone = forms.CharField(required=False)
     address = forms.CharField(widget=forms.Textarea, required=False)
-    date_of_birth = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
-    gender = forms.ChoiceField(choices=[('', 'Select Gender'), ('male', 'Male'), ('female', 'Female'), ('other', 'Other')], required=False)
+    date_of_birth = forms.DateField(
+        widget=forms.DateInput(attrs={"type": "date"}), required=False
+    )
+    gender = forms.ChoiceField(
+        choices=[
+            ("", "Select Gender"),
+            ("male", "Male"),
+            ("female", "Female"),
+            ("other", "Other"),
+        ],
+        required=False,
+    )
     photo = forms.ImageField(required=False)
 
     class Meta:
         model = UserProfile
-        fields = ['phone', 'address', 'date_of_birth', 'gender', 'photo']
+        fields = ["phone", "address", "date_of_birth", "gender", "photo"]
+
 
 # forms.py
 from django.contrib.auth.models import User
 
+
 class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['email', 'first_name', 'last_name']
+        fields = ["email", "first_name", "last_name"]
 
 
 class InquiryForm(forms.ModelForm):

@@ -90,6 +90,7 @@ def register(request):
             messages.error(request, "Please correct the errors below.")
     else:
         user_form = UserRegisterForm()
+
     context = {"user_form": user_form}
     return render(request, "registration/register.html", context)
 
