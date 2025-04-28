@@ -80,24 +80,20 @@ def trainers(request):
 def register(request):
     if request.method == "POST":
         user_form = UserRegisterForm(request.POST)
-        profile_form = UserProfileForm(request.POST, request.FILES)
-
-        if user_form.is_valid() and profile_form.is_valid():
+        if user_form.is_valid():
             user = user_form.save()
-            profile = profile_form.save(commit=False)
-            profile.user = user
-            profile.save()
-
-            messages.success(
-                request, "Your account has been created! You can now log in."
-            )
+            # Create an empty UserProfile instance for the user
+            UserProfile.objects.create(user=user)
+            messages.success(request, "Your account has been created! You can now log in.")
             return redirect("login")
+        else:
+            messages.error(request, "Please correct the errors below.")
     else:
         user_form = UserRegisterForm()
-        profile_form = UserProfileForm()
-
-    context = {"user_form": user_form, "profile_form": profile_form}
+    context = {"user_form": user_form}
     return render(request, "registration/register.html", context)
+
+
 
 
 # Registered User Views
@@ -146,24 +142,29 @@ def booking_history(request):
 
 @login_required
 def profile(request):
+    try:
+        user_profile = request.user.profile  # Access the user's UserProfile
+    except UserProfile.DoesNotExist:
+        # If UserProfile doesn't exist, create one
+        user_profile = UserProfile.objects.create(user=request.user)
+
     if request.method == "POST":
-        try:
-            profile = request.user.profile
-        except UserProfile.DoesNotExist:
-            profile = UserProfile(user=request.user)
+        user_form = UserUpdateForm(request.POST, instance=request.user)
+        profile_form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
 
-        form = UserProfileForm(request.POST, request.FILES, instance=profile)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Your profile has been updated!")
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request, "Your profile has been updated successfully!")
             return redirect("profile")
+        else:
+            messages.error(request, "Please correct the errors below.")
     else:
-        try:
-            form = UserProfileForm(instance=request.user.profile)
-        except UserProfile.DoesNotExist:
-            form = UserProfileForm()
+        user_form = UserUpdateForm(instance=request.user)
+        profile_form = UserProfileForm(instance=user_profile)
 
-    return render(request, "registration/profile.html", {"form": form})
+    context = {"user_form": user_form, "profile_form": profile_form}
+    return render(request, "registration/profile.html", context)
 
 
 @login_required
