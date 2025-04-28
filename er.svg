@@ -1,0 +1,100 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Grid Background -->
+  <defs>
+    <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+      <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#d3d3d3" stroke-width="0.5"/>
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#grid)"/>
+
+  <!-- User Entity -->
+  <rect x="50" y="50" width="150" height="180" fill="white" stroke="#0052cc" stroke-width="2"/>
+  <text x="60" y="70" font-family="Arial" font-size="14" font-weight="bold">User</text>
+  <text x="60" y="90" font-family="Arial" font-size="12">PK  id: Integer</text>
+  <text x="60" y="110" font-family="Arial" font-size="12">-email: String</text>
+  <text x="60" y="130" font-family="Arial" font-size="12">-password: String</text>
+  <text x="60" y="150" font-family="Arial" font-size="12">-first_name: String</text>
+  <text x="60" y="170" font-family="Arial" font-size="12">-last_name: String</text>
+  <text x="60" y="190" font-family="Arial" font-size="12">-is_staff: Boolean</text>
+  <text x="60" y="210" font-family="Arial" font-size="12">-date_joined: Datetime</text>
+
+  <!-- Booking Entity -->
+  <rect x="250" y="50" width="150" height="180" fill="white" stroke="#0052cc" stroke-width="2"/>
+  <text x="260" y="70" font-family="Arial" font-size="14" font-weight="bold">Booking</text>
+  <text x="260" y="90" font-family="Arial" font-size="12">PK  id: Integer</text>
+  <text x="260" y="110" font-family="Arial" font-size="12">-user_id: Integer</text>
+  <text x="260" y="130" font-family="Arial" font-size="12">-package_id: Integer</text>
+  <text x="260" y="150" font-family="Arial" font-size="12">-start_date: Date</text>
+  <text x="260" y="170" font-family="Arial" font-size="12">-end_date: Date</text>
+  <text x="260" y="190" font-family="Arial" font-size="12">-created_at: Datetime</text>
+  <text x="260" y="210" font-family="Arial" font-size="12">-payment_status: String</text>
+
+  <!-- Package Entity -->
+  <rect x="450" y="50" width="150" height="180" fill="white" stroke="#0052cc" stroke-width="2"/>
+  <text x="460" y="70" font-family="Arial" font-size="14" font-weight="bold">Package</text>
+  <text x="460" y="90" font-family="Arial" font-size="12">PK  id: Integer</text>
+  <text x="460" y="110" font-family="Arial" font-size="12">-category_id: Integer</text>
+  <text x="460" y="130" font-family="Arial" font-size="12">-package_type_id: Integer</text>
+  <text x="460" y="150" font-family="Arial" font-size="12">-name: String</text>
+  <text x="460" y="170" font-family="Arial" font-size="12">-duration: Integer</text>
+  <text x="460" y="190" font-family="Arial" font-size="12">-price: Decimal</text>
+  <text x="460" y="210" font-family="Arial" font-size="12">-is_active: Boolean</text>
+
+  <!-- Category Entity -->
+  <rect x="650" y="50" width="100" height="80" fill="white" stroke="#0052cc" stroke-width="2"/>
+  <text x="660" y="70" font-family="Arial" font-size="14" font-weight="bold">Category</text>
+  <text x="660" y="90" font-family="Arial" font-size="12">PK  id: Integer</text>
+  <text x="660" y="110" font-family="Arial" font-size="12">-name: String</text>
+
+  <!-- PackageType Entity -->
+  <rect x="650" y="150" width="100" height="80" fill="white" stroke="#0052cc" stroke-width="2"/>
+  <text x="660" y="170" font-family="Arial" font-size="14" font-weight="bold">PackageType</text>
+  <text x="660" y="190" font-family="Arial" font-size="12">PK  id: Integer</text>
+  <text x="660" y="210" font-family="Arial" font-size="12">-name: String</text>
+
+  <!-- Inquiry Entity -->
+  <rect x="50" y="300" width="150" height="180" fill="white" stroke="#0052cc" stroke-width="2"/>
+  <text x="60" y="320" font-family="Arial" font-size="14" font-weight="bold">Inquiry</text>
+  <text x="60" y="340" font-family="Arial" font-size="12">PK  id: Integer</text>
+  <text x="60" y="360" font-family="Arial" font-size="12">-user_id: Integer (Nullable)</text>
+  <text x="60" y="380" font-family="Arial" font-size="12">-name: String</text>
+  <text x="60" y="400" font-family="Arial" font-size="12">-email: String</text>
+  <text x="60" y="420" font-family="Arial" font-size="12">-phone: String</text>
+  <text x="60" y="440" font-family="Arial" font-size="12">-message: String</text>
+  <text x="60" y="460" font-family="Arial" font-size="12">-created_at: Datetime</text>
+
+  <!-- Relationships -->
+  <!-- User to Booking (1:n) -->
+  <path d="M200,110 H230" fill="none" stroke="black" stroke-width="1"/>
+  <path d="M230,110 V50" fill="none" stroke="black" stroke-width="1"/>
+  <path d="M230,50 H250" fill="none" stroke="black" stroke-width="1"/>
+  <line x1="200" y1="110" x2="190" y2="110" stroke="black" stroke-width="1"/> <!-- 1 side -->
+  <path d="M250,50 L245,45 M250,50 L245,55 M250,50 L260,50" fill="none" stroke="black" stroke-width="1"/> <!-- Crow's foot -->
+
+  <!-- Package to Booking (1:n) -->
+  <path d="M400,110 H420" fill="none" stroke="black" stroke-width="1"/>
+  <path d="M420,110 V50" fill="none" stroke="black" stroke-width="1"/>
+  <path d="M420,50 H450" fill="none" stroke="black" stroke-width="1"/>
+  <line x1="400" y1="110" x2="410" y2="110" stroke="black" stroke-width="1"/> <!-- 1 side -->
+  <path d="M450,50 L445,45 M450,50 L445,55 M450,50 L460,50" fill="none" stroke="black" stroke-width="1"/> <!-- Crow's foot -->
+
+  <!-- Category to Package (1:n) -->
+  <line x1="600" y1="90" x2="650" y2="90" stroke="black" stroke-width="1"/>
+  <line x1="600" y1="90" x2="590" y2="90" stroke="black" stroke-width="1"/> <!-- 1 side -->
+  <path d="M650,90 L645,85 M650,90 L645,95 M650,90 L660,90" fill="none" stroke="black" stroke-width="1"/> <!-- Crow's foot -->
+
+  <!-- PackageType to Package (1:n) -->
+  <line x1="600" y1="190" x2="650" y2="190" stroke="black" stroke-width="1"/>
+  <line x1="600" y1="190" x2="590" y2="190" stroke="black" stroke-width="1"/> <!-- 1 side -->
+  <path d="M650,190 L645,185 M650,190 L645,195 M650,190 L660,190" fill="none" stroke="black" stroke-width="1"/> <!-- Crow's foot -->
+
+  <!-- User to Inquiry (1:n, Optional, Dashed) -->
+  <path d="M200,170 H230" fill="none" stroke="black" stroke-width="1" stroke-dasharray="5,5"/>
+  <path d="M230,170 V300" fill="none" stroke="black" stroke-width="1" stroke-dasharray="5,5"/>
+  <path d="M230,300 H200" fill="none" stroke="black" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="200" y1="170" x2="190" y2="170" stroke="black" stroke-width="1"/> <!-- 1 side -->
+  <path d="M200,300 L195,295 M200,300 L195,305 M200,300 L210,300" fill="none" stroke="black" stroke-width="1"/> <!-- Crow's foot -->
+
+  <!-- Title -->
+  <text x="50" y="30" font-family="Arial" font-size="16" font-weight="bold">Figure 2.9.1: Fitness First GYM Management System - Entity Relationship Diagram</text>
+</svg>
