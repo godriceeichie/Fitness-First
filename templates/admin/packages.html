@@ -4,10 +4,20 @@
 
 {% block content %}
 <div class="container my-5">
-    <h2>Manage Packages</h2>
-    <div class="mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Manage Packages</h2>
         <a href="{% url 'admin_add_package' %}" class="btn btn-primary">Add New Package</a>
     </div>
+
+    {% comment %} <!-- Display Success/Error Messages -->
+    {% if messages %}
+        <div class="alert alert-info">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %} {% endcomment %}
+
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>
@@ -31,7 +41,18 @@
                         <td>{{ package.duration }} days</td>
                         <td>{{ package.is_active|yesno:"Yes,No" }}</td>
                         <td>
-                            <a href="{% url 'admin_edit_package' package.id %}" class="btn btn-sm btn-primary">Edit</a>
+                            <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editPackageModal"
+                                    data-id="{{ package.id }}"
+                                    data-name="{{ package.name }}"
+                                    data-category="{{ package.category.id }}"
+                                    data-package-type="{{ package.package_type.id }}"
+                                    data-description="{{ package.description|default_if_none:'' }}"
+                                    data-price="{{ package.price }}"
+                                    data-duration="{{ package.duration }}"
+                                    data-is-active="{{ package.is_active|yesno:'true,false' }}">Edit</button>
+                            <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deletePackageModal"
+                                    data-id="{{ package.id }}"
+                                    data-name="{{ package.name }}">Delete</button>
                         </td>
                     </tr>
                 {% empty %}
@@ -45,5 +66,131 @@
     <div class="text-center mt-4">
         <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-primary">Back to Dashboard</a>
     </div>
+
+    <!-- Edit Package Modal -->
+    <div class="modal fade" id="editPackageModal" tabindex="-1" aria-labelledby="editPackageModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editPackageModalLabel">Edit Package</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editPackageForm" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="edit-name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="edit-name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-category" class="form-label">Category</label>
+                            <select class="form-control" id="edit-category" name="category" required>
+                                {% for category in categories %}
+                                    <option value="{{ category.id }}">{{ category.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-package-type" class="form-label">Package Type</label>
+                            <select class="form-control" id="edit-package-type" name="package_type" required>
+                                {% for package_type in package_types %}
+                                    <option value="{{ package_type.id }}">{{ package_type.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-description" class="form-label">Description</label>
+                            <textarea class="form-control" id="edit-description" name="description" rows="5" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-duration" class="form-label">Duration (days)</label>
+                            <input type="number" class="form-control" id="edit-duration" name="duration" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-price" class="form-label">Price ($)</label>
+                            <input type="number" class="form-control" id="edit-price" name="price" step="0.01" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-image" class="form-label">Image</label>
+                            <input type="file" class="form-control" id="edit-image" name="image">
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="edit-is-active" name="is_active">
+                            <label for="edit-is-active" class="form-check-label">Active</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Update Package</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Package Modal -->
+    <div class="modal fade" id="deletePackageModal" tabindex="-1" aria-labelledby="deletePackageModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deletePackageModalLabel">Delete Package</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete the package "<strong id="delete-package-name"></strong>"? This action cannot be undone.</p>
+                    
+                </div>
+                <div class="modal-footer">
+                    <form id="deletePackageForm" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100">Confirm Delete</button>
+                    </form>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Handle Edit Modal
+        const editModal = document.getElementById("editPackageModal");
+        editModal.addEventListener("show.bs.modal", function (event) {
+            const button = event.relatedTarget;
+            const packageId = button.getAttribute("data-id");
+            const name = button.getAttribute("data-name");
+            const category = button.getAttribute("data-category");
+            const packageType = button.getAttribute("data-package-type");
+            const description = button.getAttribute("data-description");
+            const price = button.getAttribute("data-price");
+            const duration = button.getAttribute("data-duration");
+            const isActive = button.getAttribute("data-is-active") === "true";
+
+            // Update form action URL
+            const form = document.getElementById("editPackageForm");
+            form.action = `/admin-package/edit/${packageId}/`;
+
+            // Populate form fields
+            document.getElementById("edit-name").value = name;
+            document.getElementById("edit-category").value = category;
+            document.getElementById("edit-package-type").value = packageType;
+            document.getElementById("edit-description").value = description;
+            document.getElementById("edit-price").value = price;
+            document.getElementById("edit-duration").value = duration;
+            document.getElementById("edit-is-active").checked = isActive;
+            document.getElementById("edit-image").value = ""; // Clear file input
+        });
+
+        // Handle Delete Modal
+        const deleteModal = document.getElementById("deletePackageModal");
+        deleteModal.addEventListener("show.bs.modal", function (event) {
+            const button = event.relatedTarget;
+            const packageId = button.getAttribute("data-id");
+            const name = button.getAttribute("data-name");
+
+            // Update form action URL and confirmation text
+            const form = document.getElementById("deletePackageForm");
+            form.action = `/admin-package/delete/${packageId}/`;
+            document.getElementById("delete-package-name").textContent = name;
+        });
+    });
+</script>
 {% endblock %}

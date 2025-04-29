@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Fitness First GYM - Delete Category{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2>Delete Category: {{ category.name }}</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-body">
+                    <p>Are you sure you want to delete the category "<strong>{{ category.name }}</strong>"? This action cannot be undone.</p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100">Confirm Delete</button>
+                    </form>
+                    <div class="text-center mt-3">
+                        <a href="{% url 'admin_categories' %}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

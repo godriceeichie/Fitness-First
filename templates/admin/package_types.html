@@ -5,21 +5,38 @@
 {% block content %}
 <div class="container my-5">
     <h2>Manage Package Types</h2>
+
+    <!-- Display Success/Error Messages -->
+    {% if messages %}
+        <div class="alert alert-info">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+
     <div class="row">
         <div class="col-md-4 mb-4">
             <div class="card shadow">
                 <div class="card-body">
                     <h5 class="card-title">Add New Package Type</h5>
-                    <form method="post">
+                    <form method="post" action="{% url 'admin_package_types' %}">
                         {% csrf_token %}
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea class="form-control" id="description" name="description" rows="4"></textarea>
-                        </div>
+                        {{ form.as_p }}
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                <ul>
+                                    {% for field in form %}
+                                        {% for error in field.errors %}
+                                            <li>{{ field.label }}: {{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                    {% for error in form.non_field_errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
                         <button type="submit" class="btn btn-primary w-100">Add Package Type</button>
                     </form>
                 </div>
@@ -33,6 +50,7 @@
                             <th>Name</th>
                             <th>Description</th>
                             <th>Created At</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -41,10 +59,19 @@
                                 <td>{{ package_type.name }}</td>
                                 <td>{{ package_type.description|truncatechars:100 }}</td>
                                 <td>{{ package_type.created_at|date:"Y-m-d" }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editPackageTypeModal"
+                                            data-id="{{ package_type.id }}"
+                                            data-name="{{ package_type.name }}"
+                                            data-description="{{ package_type.description|default_if_none:'' }}">Edit</button>
+                                    <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deletePackageTypeModal"
+                                            data-id="{{ package_type.id }}"
+                                            data-name="{{ package_type.name }}">Delete</button>
+                                </td>
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="3" class="text-center">No package types found.</td>
+                                <td colspan="4" class="text-center">No package types found.</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -55,5 +82,87 @@
     <div class="text-center mt-4">
         <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-primary">Back to Dashboard</a>
     </div>
+
+    <!-- Edit Package Type Modal -->
+    <div class="modal fade" id="editPackageTypeModal" tabindex="-1" aria-labelledby="editPackageTypeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editPackageTypeModalLabel">Edit Package Type</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editPackageTypeForm" method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="edit-name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="edit-name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-description" class="form-label">Description</label>
+                            <textarea class="form-control" id="edit-description" name="description" rows="4"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Update Package Type</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Package Type Modal -->
+    <div class="modal fade" id="deletePackageTypeModal" tabindex="-1" aria-labelledby="deletePackageTypeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deletePackageTypeModalLabel">Delete Package Type</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete the package type "<strong id="delete-package-type-name"></strong>"? This action cannot be undone.</p>
+                    <form id="deletePackageTypeForm" method="post">
+                        {% csrf_token %}
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" form="deletePackageTypeForm" class="btn btn-danger">Confirm Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Handle Edit Modal
+        const editModal = document.getElementById("editPackageTypeModal");
+        editModal.addEventListener("show.bs.modal", function (event) {
+            const button = event.relatedTarget;
+            const packageTypeId = button.getAttribute("data-id");
+            const name = button.getAttribute("data-name");
+            const description = button.getAttribute("data-description");
+
+            // Update form action URL
+            const form = document.getElementById("editPackageTypeForm");
+            form.action = `/admin-package-types/edit/${packageTypeId}/`;
+
+            // Populate form fields
+            document.getElementById("edit-name").value = name;
+            document.getElementById("edit-description").value = description;
+        });
+
+        // Handle Delete Modal
+        const deleteModal = document.getElementById("deletePackageTypeModal");
+        deleteModal.addEventListener("show.bs.modal", function (event) {
+            const button = event.relatedTarget;
+            const packageTypeId = button.getAttribute("data-id");
+            const name = button.getAttribute("data-name");
+
+            // Update form action URL and confirmation text
+            const form = document.getElementById("deletePackageTypeForm");
+            form.action = `/admin-package-types/delete/${packageTypeId}/`;
+            document.getElementById("delete-package-type-name").textContent = name;
+        });
+    });
+</script>
 {% endblock %}

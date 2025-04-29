@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.db.models import Sum
 from django.utils import timezone
 
+
 from .models import *
 from .forms import *
 
@@ -90,7 +91,6 @@ def register(request):
             messages.error(request, "Please correct the errors below.")
     else:
         user_form = UserRegisterForm()
-
     context = {"user_form": user_form}
     return render(request, "registration/register.html", context)
 
@@ -115,22 +115,24 @@ def dashboard(request):
     return render(request, "gym/dashboard.html", context)
 
 
+
 @login_required
 def book_package(request, package_id):
     package = get_object_or_404(Package, pk=package_id, is_active=True)
 
     if request.method == "POST":
-        form = BookingForm(request.POST)
+        form = BookingForm(request.POST, user=request.user)
         if form.is_valid():
             booking = form.save(commit=False, user=request.user)
             booking.save()
-
             messages.success(
                 request, f"You have successfully booked the {package.name} package!"
             )
             return redirect("booking_history")
+        else:
+            messages.error(request, "Please correct the errors below.")
     else:
-        form = BookingForm(initial={"package": package})
+        form = BookingForm(initial={"package": package}, user=request.user)
 
     return render(request, "gym/book_package.html", {"form": form, "package": package})
 
@@ -140,13 +142,16 @@ def booking_history(request):
     bookings = Booking.objects.filter(user=request.user).order_by("-created_at")
     return render(request, "gym/booking_history.html", {"bookings": bookings})
 
+@login_required
+def booking_detail(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id, user=request.user)
+    return render(request, "gym/booking_detail.html", {"booking": booking})
 
 @login_required
 def profile(request):
     try:
-        user_profile = request.user.profile  # Access the user's UserProfile
+        user_profile = request.user.profile
     except UserProfile.DoesNotExist:
-        # If UserProfile doesn't exist, create one
         user_profile = UserProfile.objects.create(user=request.user)
 
     if request.method == "POST":
@@ -184,7 +189,9 @@ def change_password(request):
                 messages.success(request, "Your password was successfully updated!")
                 return redirect("dashboard")
             else:
-                messages.error(request, "Current password is incorrect!")
+                form.add_error("current_password", "Current password is incorrect!")
+        else:
+            messages.error(request, "Please correct the errors below.")
     else:
         form = PasswordChangeForm()
 
@@ -282,8 +289,15 @@ def admin_packages(request):
         messages.error(request, "You don't have permission to access this page!")
         return redirect("dashboard")
 
-    packages = Package.objects.all().order_by("-created_at")
-    return render(request, "admin/packages.html", {"packages": packages})
+    packages = Package.objects.all().order_by("name")
+    categories = Category.objects.all()
+    package_types = PackageType.objects.all()
+    return render(request, "admin/packages.html", {
+        "packages": packages,
+        "categories": categories,
+        "package_types": package_types
+    })
+
 
 
 @login_required
@@ -295,16 +309,51 @@ def admin_categories(request):
     categories = Category.objects.all().order_by("name")
 
     if request.method == "POST":
-        name = request.POST.get("name")
-        description = request.POST.get("description")
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Category "{form.cleaned_data["name"]}" has been added!')
+            return redirect("admin_categories")
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = CategoryForm()
 
-        category = Category(name=name, description=description)
-        category.save()
+    return render(request, "admin/categories.html", {"categories": categories, "form": form})
 
-        messages.success(request, f'Category "{name}" has been added!')
-        return redirect("admin_categories")
+@login_required
+def edit_category(request, category_id):
+    if not request.user.is_staff:
+        messages.error(request, "You don't have permission to access this page!")
+        return redirect("dashboard")
 
-    return render(request, "admin/categories.html", {"categories": categories})
+    category = get_object_or_404(Category, id=category_id)
+
+    if request.method == "POST":
+        form = CategoryForm(request.POST, instance=category)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Category "{category.name}" has been updated!')
+        else:
+            messages.error(request, "Please correct the errors below.")
+        return redirect("admin_categories")  # Always redirect back
+    else:
+        # This won't be used with modals, but keep for robustness
+        form = CategoryForm(instance=category)
+        return render(request, "admin/categories.html", {"form": form, "category": category})
+
+@login_required
+def delete_category(request, category_id):
+    if not request.user.is_staff:
+        messages.error(request, "You don't have permission to access this page!")
+        return redirect("dashboard")
+
+    category = get_object_or_404(Category, id=category_id)
+    if request.method == "POST":
+        category_name = category.name
+        category.delete()
+        messages.success(request, f'Category "{category_name}" has been deleted!')
+    return redirect("admin_categories")  # Always redirect back
 
 
 @login_required
@@ -316,16 +365,55 @@ def admin_package_types(request):
     package_types = PackageType.objects.all().order_by("name")
 
     if request.method == "POST":
-        name = request.POST.get("name")
-        description = request.POST.get("description")
+        form = PackageTypeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Package Type "{form.cleaned_data["name"]}" has been added!')
+            return redirect("admin_package_types")
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = PackageTypeForm()
 
-        package_type = PackageType(name=name, description=description)
-        package_type.save()
+    return render(request, "admin/package_types.html", {"package_types": package_types, "form": form})
 
-        messages.success(request, f'Package Type "{name}" has been added!')
+@login_required
+def edit_package_type(request, package_type_id):
+    if not request.user.is_staff:
+        messages.error(request, "You don't have permission to access this page!")
+        return redirect("dashboard")
+
+    package_type = get_object_or_404(PackageType, id=package_type_id)
+
+    if request.method == "POST":
+        form = PackageTypeForm(request.POST, instance=package_type)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Package Type "{package_type.name}" has been updated!')
+        else:
+            messages.error(request, "Please correct the errors below.")
         return redirect("admin_package_types")
+    else:
+        form = PackageTypeForm(instance=package_type)
+        return render(request, "admin/package_types.html", {"form": form, "package_type": package_type})
 
-    return render(request, "admin/package_types.html", {"package_types": package_types})
+@login_required
+def delete_package_type(request, package_type_id):
+    if not request.user.is_staff:
+        messages.error(request, "You don't have permission to access this page!")
+        return redirect("dashboard")
+
+    package_type = get_object_or_404(PackageType, id=package_type_id)
+    if request.method == "POST":
+        package_type_name = package_type.name
+        try:
+            package_type.delete()
+            messages.success(request, f'Package Type "{package_type_name}" has been deleted!')
+        except Exception as e:
+            messages.error(request, f'Cannot delete "{package_type_name}" because it is referenced by existing packages.')
+        return redirect("admin_package_types")
+    return redirect("admin_package_types")
+
 
 
 @login_required
@@ -335,44 +423,21 @@ def admin_add_package(request):
         return redirect("dashboard")
 
     if request.method == "POST":
-        name = request.POST.get("name")
-        category_id = request.POST.get("category")
-        package_type_id = request.POST.get("package_type")
-        description = request.POST.get("description")
-        duration = request.POST.get("duration")
-        price = request.POST.get("price")
-        is_active = "is_active" in request.POST
+        form = PackageForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Package "{form.cleaned_data["name"]}" has been added!')
+            return redirect("admin_packages")
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = PackageForm()
 
-        category = get_object_or_404(Category, id=category_id)
-        package_type = get_object_or_404(PackageType, id=package_type_id)
-
-        package = Package(
-            name=name,
-            category=category,
-            package_type=package_type,
-            description=description,
-            duration=duration,
-            price=price,
-            is_active=is_active,
-        )
-
-        if "image" in request.FILES:
-            package.image = request.FILES["image"]
-
-        package.save()
-
-        messages.success(request, f'Package "{name}" has been added!')
-        return redirect("admin_packages")
-
-    categories = Category.objects.all()
-    package_types = PackageType.objects.all()
-
-    context = {
-        "categories": categories,
-        "package_types": package_types,
-    }
-    return render(request, "admin/add_package.html", context)
-
+    return render(request, "admin/add_package.html", {
+        "form": form,
+        "categories": Category.objects.all(),
+        "package_types": PackageType.objects.all()
+    })
 
 @login_required
 def admin_edit_package(request, package_id):
@@ -383,34 +448,34 @@ def admin_edit_package(request, package_id):
     package = get_object_or_404(Package, id=package_id)
 
     if request.method == "POST":
-        package.name = request.POST.get("name")
-        package.category = get_object_or_404(Category, id=request.POST.get("category"))
-        package.package_type = get_object_or_404(
-            PackageType, id=request.POST.get("package_type")
-        )
-        package.description = request.POST.get("description")
-        package.duration = request.POST.get("duration")
-        package.price = request.POST.get("price")
-        package.is_active = "is_active" in request.POST
-
-        if "image" in request.FILES:
-            package.image = request.FILES["image"]
-
-        package.save()
-
-        messages.success(request, f'Package "{package.name}" has been updated!')
+        form = PackageForm(request.POST, request.FILES, instance=package)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Package "{package.name}" has been updated!')
+        else:
+            messages.error(request, "Please correct the errors below.")
         return redirect("admin_packages")
+    else:
+        form = PackageForm(instance=package)
+        return render(request, "admin/packages.html", {
+            "form": form,
+            "package": package,
+            "categories": Category.objects.all(),
+            "package_types": PackageType.objects.all()
+        })
 
-    categories = Category.objects.all()
-    package_types = PackageType.objects.all()
+@login_required
+def admin_delete_package(request, package_id):
+    if not request.user.is_staff:
+        messages.error(request, "You don't have permission to access this page!")
+        return redirect("dashboard")
 
-    context = {
-        "package": package,
-        "categories": categories,
-        "package_types": package_types,
-    }
-    return render(request, "admin/edit_package.html", context)
-
+    package = get_object_or_404(Package, id=package_id)
+    if request.method == "POST":
+        package_name = package.name
+        package.delete()
+        messages.success(request, f'Package "{package_name}" has been deleted!')
+    return redirect("admin_packages")
 
 @login_required
 def admin_reports(request):

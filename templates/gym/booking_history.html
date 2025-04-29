@@ -10,7 +10,8 @@
             <thead>
                 <tr>
                     <th>Package</th>
-                    <th>Booking Date</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
                     <th>Price</th>
                     <th>Payment Status</th>
                     <th>Action</th>
@@ -20,16 +21,18 @@
                 {% for booking in bookings %}
                     <tr>
                         <td>{{ booking.package.name }}</td>
-                        <td>{{ booking.booking_date|date:"Y-m-d" }}</td>
+                        <td>{{ booking.start_date|date:"Y-m-d"|default:"Not set" }}</td>
+                        <td>{{ booking.end_date|date:"Y-m-d"|default:"Not set" }}</td>
                         <td>${{ booking.package.price }}</td>
-                        <td>{{ booking.payment_status }}</td>
+                        <td>{{ booking.payment_status|title }}</td>
                         <td>
-                            <a href="{% url 'book_package' booking.id %}" class="btn btn-sm btn-primary">View Details</a>
+                            <!-- Placeholder for booking detail view -->
+                            <a href="{% url 'booking_detail' booking.id %}" class="btn btn-sm btn-primary">View Details</a>
                         </td>
                     </tr>
                 {% empty %}
                     <tr>
-                        <td colspan="5" class="text-center">No bookings found.</td>
+                        <td colspan="6" class="text-center">No bookings found.</td>
                     </tr>
                 {% endfor %}
             </tbody>

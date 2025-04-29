@@ -3,23 +3,42 @@
 {% block title %}Fitness First GYM - Manage Categories{% endblock %}
 
 {% block content %}
+
+
 <div class="container my-5">
     <h2>Manage Categories</h2>
+
+    <!-- Display Success/Error Messages -->
+    {% comment %} {% if messages %}
+        <div class="alert alert-info">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %} {% endcomment %}
+
     <div class="row">
         <div class="col-md-4 mb-4">
             <div class="card shadow">
                 <div class="card-body">
                     <h5 class="card-title">Add New Category</h5>
-                    <form method="post">
+                    <form method="post" action="{% url 'admin_categories' %}">
                         {% csrf_token %}
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea class="form-control" id="description" name="description" rows="4"></textarea>
-                        </div>
+                        {{ form.as_p }}
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                <ul>
+                                    {% for field in form %}
+                                        {% for error in field.errors %}
+                                            <li>{{ field.label }}: {{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                    {% for error in form.non_field_errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
                         <button type="submit" class="btn btn-primary w-100">Add Category</button>
                     </form>
                 </div>
@@ -33,6 +52,7 @@
                             <th>Name</th>
                             <th>Description</th>
                             <th>Created At</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -41,10 +61,19 @@
                                 <td>{{ category.name }}</td>
                                 <td>{{ category.description|truncatechars:100 }}</td>
                                 <td>{{ category.created_at|date:"Y-m-d" }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editCategoryModal"
+                                            data-id="{{ category.id }}"
+                                            data-name="{{ category.name }}"
+                                            data-description="{{ category.description|default_if_none:'' }}">Edit</button>
+                                    <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal"
+                                            data-id="{{ category.id }}"
+                                            data-name="{{ category.name }}">Delete</button>
+                                </td>
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="3" class="text-center">No categories found.</td>
+                                <td colspan="4" class="text-center">No categories found.</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -55,5 +84,88 @@
     <div class="text-center mt-4">
         <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-primary">Back to Dashboard</a>
     </div>
+
+    <!-- Edit Category Modal -->
+    <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editCategoryModalLabel">Edit Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editCategoryForm" method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="edit-name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="edit-name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-description" class="form-label">Description</label>
+                            <textarea class="form-control" id="edit-description" name="description" rows="4"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Update Category</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Category Modal -->
+    <div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="deleteCategoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteCategoryModalLabel">Delete Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete the category "<strong id="delete-category-name"></strong>"? This action cannot be undone.</p>
+                    
+                </div>
+                <div class="modal-footer">
+                    <form id="deleteCategoryForm" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100">Confirm Delete</button>
+                    </form>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Handle Edit Modal
+        const editModal = document.getElementById("editCategoryModal");
+        editModal.addEventListener("show.bs.modal", function (event) {
+            const button = event.relatedTarget; // Button that triggered the modal
+            const categoryId = button.getAttribute("data-id");
+            const name = button.getAttribute("data-name");
+            const description = button.getAttribute("data-description");
+
+            // Update form action URL
+            const form = document.getElementById("editCategoryForm");
+            form.action = `/admin-categories/edit/${categoryId}/`;
+
+            // Populate form fields
+            document.getElementById("edit-name").value = name;
+            document.getElementById("edit-description").value = description;
+        });
+
+        // Handle Delete Modal
+        const deleteModal = document.getElementById("deleteCategoryModal");
+        deleteModal.addEventListener("show.bs.modal", function (event) {
+            const button = event.relatedTarget;
+            const categoryId = button.getAttribute("data-id");
+            const name = button.getAttribute("data-name");
+
+            // Update form action URL and confirmation text
+            const form = document.getElementById("deleteCategoryForm");
+            form.action = `/admin-categories/delete/${categoryId}/`;
+            document.getElementById("delete-category-name").textContent = name;
+        });
+    });
+</script>
 {% endblock %}

@@ -3,6 +3,89 @@
 {% block title %}Fitness First GYM - Profile{% endblock %}
 
 {% block content %}
+<style>
+    /* Avatar container */
+    .avatar-container {
+        position: relative;
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 20px;
+        cursor: pointer;
+    }
+
+    /* Avatar image */
+    .avatar {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #ddd;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: opacity 0.3s ease;
+    }
+
+    /* Placeholder div */
+    .avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background-color: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 3px solid #ddd;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        color: #666;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        user-select: none;
+    }
+
+    /* Hover overlay */
+    .avatar-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.4);
+        opacity: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 14px;
+        transition: opacity 0.3s ease;
+    }
+
+    .avatar-container:hover .avatar-overlay {
+        opacity: 1;
+    }
+
+    .avatar-container:hover .avatar,
+    .avatar-container:hover .avatar-placeholder {
+        opacity: 0.7;
+    }
+
+    /* Hide default file input */
+    #id_photo {
+        display: none;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 576px) {
+        .avatar-container {
+            width: 100px;
+            height: 100px;
+        }
+        .avatar-placeholder {
+            font-size: 14px;
+        }
+    }
+</style>
+
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
@@ -43,8 +126,21 @@
                         </div>
                     {% endif %}
 
+                    <!-- Avatar Section -->
+                    <div class="avatar-container" title="Click to upload a new photo">
+                        {% if user.profile.photo %}
+                            <img src="{{ user.profile.photo.url }}" alt="Profile Photo" class="avatar" id="avatar-image">
+                        {% else %}
+                            <div class="avatar-placeholder" id="avatar-placeholder">User</div>
+                        {% endif %}
+                        <div class="avatar-overlay">Change Photo</div>
+                    </div>
+
                     <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
+                        <!-- Hidden file input for photo upload -->
+                        <input type="file" id="id_photo" name="photo" accept="image/*">
+
                         <!-- UserUpdateForm Fields -->
                         <div class="mb-3">
                             <label for="id_username" class="form-label">Username</label>
@@ -74,7 +170,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="id_date_of_birth" class="form-label">Date of Birth</label>
-                            <input type="date" class="form-control" id="id_date_of_birth" name="date_of_birth" value="{{ profile_form.date_of_birth.value|default_if_none:'' }}">
+                            <input type="date" class="form-control" id="id_date_of_birth" name="date_of_birth" value="{{ profile_form.date_of_birth.value|date:'Y-m-d'|default_if_none:'' }}">
                         </div>
                         <div class="mb-3">
                             <label for="id_gender" class="form-label">Gender</label>
@@ -85,13 +181,6 @@
                                 <option value="other" {% if profile_form.gender.value == 'other' %}selected{% endif %}>Other</option>
                             </select>
                         </div>
-                        <div class="mb-3">
-                            <label for="id_photo" class="form-label">Profile Photo</label>
-                            <input type="file" class="form-control" id="id_photo" name="photo">
-                            {% if user.profile.photo %}
-                                <p>Current Photo: <img src="{{ user.profile.photo.url }}" alt="Profile Photo" style="max-width: 100px; margin-top: 10px;"></p>
-                            {% endif %}
-                        </div>
 
                         <button type="submit" class="btn btn-primary w-100">Update Profile</button>
                     </form>
@@ -100,4 +189,43 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const avatarContainer = document.querySelector(".avatar-container");
+        const photoInput = document.getElementById("id_photo");
+        const avatarImage = document.getElementById("avatar-image");
+        const avatarPlaceholder = document.getElementById("avatar-placeholder");
+
+        if (avatarContainer && photoInput) {
+            // Trigger file input on avatar click
+            avatarContainer.addEventListener("click", function () {
+                photoInput.click();
+            });
+
+            // Preview selected image
+            photoInput.addEventListener("change", function () {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        // If there's a placeholder, replace it with an img element
+                        if (avatarPlaceholder) {
+                            const newImg = document.createElement("img");
+                            newImg.src = e.target.result;
+                            newImg.alt = "Profile Photo";
+                            newImg.className = "avatar";
+                            newImg.id = "avatar-image";
+                            avatarPlaceholder.replaceWith(newImg);
+                        } else if (avatarImage) {
+                            // Update existing image
+                            avatarImage.src = e.target.result;
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}
